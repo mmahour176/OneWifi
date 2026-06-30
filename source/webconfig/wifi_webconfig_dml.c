@@ -296,26 +296,19 @@ webconfig_error_t encode_dml_subdoc(webconfig_t *config, webconfig_subdoc_data_t
         }
     }
 
-    str = cJSON_Print(json);
-
-    data->u.encoded.raw = (webconfig_subdoc_encoded_raw_t)calloc(strlen(str) + 1, sizeof(char));
+    data->u.encoded.raw = (webconfig_subdoc_encoded_raw_t)cJSON_Print(json);
     if (data->u.encoded.raw == NULL) {
         wifi_util_error_print(WIFI_WEBCONFIG,"%s:%d Failed to allocate memory.\n", __func__,__LINE__);
-        cJSON_free(str);
         cJSON_Delete(json);
         return webconfig_error_encode;
     }
 
-    memcpy(data->u.encoded.raw, str, strlen(str));
-
-    json_param_obscure(str, "Passphrase");
-    json_param_obscure(str, "WpsConfigPin");
-    json_param_obscure(str, "RadiusSecret");
-    json_param_obscure(str, "SecondaryRadiusSecret");
-    json_param_obscure(str, "DasSecret");
-    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d: Encoded JSON:\n%s\n", __func__, __LINE__, str);
-
-    cJSON_free(str);
+    json_param_obscure((char*)data->u.encoded.raw, "Passphrase");
+    json_param_obscure((char*)data->u.encoded.raw, "WpsConfigPin");
+    json_param_obscure((char*)data->u.encoded.raw, "RadiusSecret");
+    json_param_obscure((char*)data->u.encoded.raw, "SecondaryRadiusSecret");
+    json_param_obscure((char*)data->u.encoded.raw, "DasSecret");
+    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d: Encoded JSON:\n%s\n", __func__, __LINE__, data->u.encoded.raw);
     cJSON_Delete(json);
     wifi_util_info_print(WIFI_WEBCONFIG, "%s:%d: encode success\n", __func__, __LINE__);
 
@@ -341,16 +334,6 @@ webconfig_error_t decode_dml_subdoc(webconfig_t *config, webconfig_subdoc_data_t
     webconfig_subdoc_decoded_data_t *params;
     wifi_platform_property_t *wifi_prop;
     int num_vaps;
-    char *str;
-
-    str = cJSON_Print(json);
-    json_param_obscure(str, "Passphrase");
-    json_param_obscure(str, "WpsConfigPin");
-    json_param_obscure(str, "RadiusSecret");
-    json_param_obscure(str, "SecondaryRadiusSecret");
-    json_param_obscure(str, "DasSecret");
-    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d: decoded JSON:\n%s\n", __func__, __LINE__, str);
-    cJSON_free(str);
 
     params = &data->u.decoded;
     doc = &config->subdocs[data->type];

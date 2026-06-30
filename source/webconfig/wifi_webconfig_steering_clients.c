@@ -131,19 +131,14 @@ webconfig_error_t encode_steering_clients_subdoc(webconfig_t *config, webconfig_
         return webconfig_error_encode;
     }
 
-    str = cJSON_Print(json);
-
-    data->u.encoded.raw = (webconfig_subdoc_encoded_raw_t)calloc(strlen(str) + 1, sizeof(char));
+    data->u.encoded.raw = (webconfig_subdoc_encoded_raw_t)cJSON_Print(json);
     if (data->u.encoded.raw == NULL) {
         wifi_util_error_print(WIFI_WEBCONFIG,"%s:%d Failed to allocate memory.\n", __func__,__LINE__);
-        cJSON_free(str);
         cJSON_Delete(json);
         return webconfig_error_encode;
     }
 
-    memcpy(data->u.encoded.raw, str, strlen(str));
-    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d: Encoded JSON:\n%s\n", __func__, __LINE__, str);
-    cJSON_free(str);
+    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d: Encoded JSON:\n%s\n", __func__, __LINE__, data->u.encoded.raw);
     cJSON_Delete(json);
 
     if ((data->descriptor & webconfig_data_descriptor_translate_from_ovsdb) == webconfig_data_descriptor_translate_from_ovsdb) {
@@ -177,11 +172,6 @@ webconfig_error_t decode_steering_clients_subdoc(webconfig_t *config, webconfig_
         wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d: NULL json pointer\n", __func__, __LINE__);
         return webconfig_error_decode;
     }
-
-    char *str;
-    str = cJSON_Print(json);
-    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d: Decoded Str is : %s\n", __func__, __LINE__, str);
-    cJSON_free(str);
 
 
     doc = &config->subdocs[data->type];

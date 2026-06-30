@@ -243,19 +243,14 @@ webconfig_error_t encode_associated_clients_subdoc(webconfig_t *config,
     }
 #endif
 
-    str = cJSON_Print(json);
-
-    data->u.encoded.raw = (webconfig_subdoc_encoded_raw_t)calloc(strlen(str) + 1, sizeof(char));
+    data->u.encoded.raw = (webconfig_subdoc_encoded_raw_t)cJSON_Print(json);
     if (data->u.encoded.raw == NULL) {
         wifi_util_error_print(WIFI_WEBCONFIG,"%s:%d Failed to allocate memory.\n", __func__,__LINE__);
-        cJSON_free(str);
         cJSON_Delete(json);
         return webconfig_error_encode;
     }
 
-    memcpy(data->u.encoded.raw, str, strlen(str));
-    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d: %s\n", __func__, __LINE__, str);
-    cJSON_free(str);
+    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d: %s\n", __func__, __LINE__, data->u.encoded.raw);
     cJSON_Delete(json);
     wifi_util_info_print(WIFI_WEBCONFIG, "%s:%d: encode success\n", __func__, __LINE__);
     return webconfig_error_none;

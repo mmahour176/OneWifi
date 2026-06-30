@@ -130,20 +130,14 @@ webconfig_error_t encode_mesh_backhaul_sta_subdoc(webconfig_t *config, webconfig
         }
     }
 
-    str = cJSON_Print(json);
-
-    data->u.encoded.raw = (webconfig_subdoc_encoded_raw_t)calloc(strlen(str) + 1, sizeof(char));
+    data->u.encoded.raw = (webconfig_subdoc_encoded_raw_t)cJSON_Print(json);
     if (data->u.encoded.raw == NULL) {
         wifi_util_error_print(WIFI_WEBCONFIG,"%s:%d Failed to allocate memory.\n", __func__,__LINE__);
-        cJSON_free(str);
         cJSON_Delete(json);
         return webconfig_error_encode;
     }
 
-    memcpy(data->u.encoded.raw, str, strlen(str));
-
-    // wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d: Encoded JSON:\n%s\n", __func__, __LINE__, str);
-    cJSON_free(str);
+    // wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d: Encoded JSON:\n%s\n", __func__, __LINE__, data->u.encoded.raw);
     cJSON_Delete(json);
     wifi_util_info_print(WIFI_WEBCONFIG, "%s:%d: encode success\n", __func__, __LINE__);
     return webconfig_error_none;
@@ -170,10 +164,7 @@ webconfig_error_t decode_mesh_backhaul_sta_subdoc(webconfig_t *config, webconfig
     /* get list of mesh_sta SSID */
     num_mesh_ssid = get_list_of_mesh_sta(&params->hal_cap.wifi_prop, MAX_NUM_RADIOS, vap_names);
 
-    str = cJSON_Print(json);
-    json_param_obscure(str, "Passphrase");
-    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d: decoded JSON:\n%s\n", __func__, __LINE__, str);
-    cJSON_free(str);
+    
 
     for (i = 0; i < doc->num_objects; i++) {
         if ((cJSON_GetObjectItem(json, doc->objects[i].name)) == NULL) {
