@@ -397,6 +397,7 @@ static int prepare_sta_lins_metrics_data(per_sta_metrics_t *data, wifi_associate
 static int em_sta_stats_publish(wifi_app_t *app, client_assoc_data_t *stats, int stat_array_size,
     unsigned int vap_index)
 {
+    wifi_util_dbg_print(WIFI_EM, "%s:%d: enter", __func__, __LINE__);
     webconfig_subdoc_data_t *data;
     raw_data_t rdata;
     int rc;
@@ -1728,6 +1729,7 @@ int client_diag_config_to_monitor_queue(wifi_app_t *app, wifi_monitor_data_t *da
 
 static int ap_report_push_cb(em_ap_report_callback_arg_t *args)
 {
+    wifi_util_dbg_print(WIFI_EM, "%s:%d: Entry to :", __func__, __LINE__);
     int rc = RETURN_OK;
     int radio_index = 0;
     em_policy_req_type_t policy_type = em_ap_metrics_report_cache.args.policy_type;
