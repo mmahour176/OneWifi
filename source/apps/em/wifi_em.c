@@ -883,10 +883,12 @@ static int em_publish_stats_data(channel_scan_response_t *scan_response)
     if (status != bus_error_success) {
         wifi_util_error_print(WIFI_EM, "%s:%d: bus: bus_event_publish_fn Event failed %d\n",
             __func__, __LINE__, status);
+        webconfig_data_free(data);
         free(data->u.decoded.collect_stats.stats);
         free(data);
         return RETURN_ERR;
     }
+    webconfig_data_free(data);
     free(data->u.decoded.collect_stats.stats);
     free(data);
 
@@ -2872,6 +2874,7 @@ static int em_beacon_report_publish(bus_handle_t *handle, void *msg_data)
     if (rc != bus_error_success) {
         wifi_util_error_print(WIFI_EM, "%s:%d: bus_event_publish_fn Event failed %d\n", __func__,
             __LINE__, rc);
+        webconfig_data_free(wb_data);
         free(wb_data);
         return RETURN_ERR;
     } else {
@@ -2879,6 +2882,8 @@ static int em_beacon_report_publish(bus_handle_t *handle, void *msg_data)
             __LINE__, WIFI_EM_BEACON_REPORT);
     }
 
+    webconfig_data_free(wb_data);
+    free(wb_data);
     return RETURN_OK;
 }
 
