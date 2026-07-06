@@ -1329,6 +1329,7 @@ done:
 }
 static int update_vap_info_managed_xfinity(void *data, wifi_vap_info_t *vap_info, pErr execRetVal)
 {
+    wifi_util_info_print(WIFI_CTRL, "%s:%d Maniesh \n", __func__, __LINE__); 
     int status = RETURN_OK;
     cJSON *root = NULL;
     cJSON *param = NULL;
@@ -1366,6 +1367,7 @@ static int update_vap_info_managed_xfinity(void *data, wifi_vap_info_t *vap_info
 
 static int update_vap_info_with_blob_info(void *blob, void *amenities_blob, webconfig_subdoc_data_t *data, const char *vap_prefix, bool managed_wifi_enabled,pErr execRetVal)
 {
+    wifi_util_dbg_print(WIFI_CTRL, "%s: %d Maniesh", __FUNCTION__, __LINE__);
     int status = RETURN_OK;
     int num_vaps = 0;
     int vap_index;
@@ -1650,6 +1652,7 @@ bool webconf_ver_txn(const char* bb, uint32_t *ver, uint16_t *txn)
 
 pErr wifi_vap_cfg_subdoc_handler(void *data)
 {
+    wifi_util_dbg_print(WIFI_CTRL, "%s: %d Maniesh", __FUNCTION__, __LINE__);
     pErr execRetVal = NULL;
     unsigned long msg_size = 0L;
     unsigned char *msg = NULL;
@@ -1916,6 +1919,7 @@ done:
 
 pErr webconf_process_managed_subdoc(void* data)
 {
+    wifi_util_dbg_print(WIFI_CTRL, "%s: %d Maniesh", __func__, __LINE__);
     pErr execRetVal = NULL;
     unsigned long msg_size = 0L;
     unsigned char *msg = NULL;
@@ -2197,6 +2201,7 @@ void process_managed_wifi_disable ()
 
 void webconf_process_private_vap(const char* enb)
 {
+  wifi_util_dbg_print(WIFI_CTRL, "%s:%d Maniesh  \n", __func__, __LINE__);
 #ifdef ONEWIFI_RDKB_APP_SUPPORT
     char *blob_buf = unpackDecode(enb);
     if(blob_buf == NULL) {

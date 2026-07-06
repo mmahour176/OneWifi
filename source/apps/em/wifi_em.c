@@ -414,6 +414,7 @@ static int prepare_sta_lins_metrics_data(per_sta_metrics_t *data, wifi_associate
 static int em_sta_stats_publish(wifi_app_t *app, client_assoc_data_t *stats, int stat_array_size,
     unsigned int vap_index)
 {
+    wifi_util_dbg_print(WIFI_EM, "%s: %d Maniesh", __func__, __LINE__);
     webconfig_subdoc_data_t *data;
     raw_data_t rdata;
     int rc;
@@ -843,6 +844,7 @@ static int em_prepare_scan_response_data(wifi_provider_response_t *provider_resp
 
 static int em_publish_stats_data(channel_scan_response_t *scan_response)
 {
+    wifi_util_dbg_print(WIFI_EM, "%s: %d Maniesh", __func__, __LINE__);
     webconfig_subdoc_data_t *data;
     bus_error_t status;
     char eventName[MAX_EVENT_NAME_SIZE] = { 0 };
@@ -1554,6 +1556,7 @@ static int em_handle_failed_connection(wifi_app_t *app, void *arg)
 
 static int em_handle_disassoc_device(wifi_app_t *app, void *arg)
 {
+    wifi_util_dbg_print(WIFI_EM, "%s: %d Maniesh", __func__, __LINE__);
     wifi_ctrl_t *ctrl = (wifi_ctrl_t *)get_wifictrl_obj();
     assoc_dev_data_t *assoc_data = (assoc_dev_data_t *)arg;
     char client_mac[32];
@@ -1770,6 +1773,7 @@ int client_diag_config_to_monitor_queue(wifi_app_t *app, wifi_monitor_data_t *da
 
 static int ap_report_push_cb(em_ap_report_callback_arg_t *args)
 {
+    wifi_util_dbg_print(WIFI_EM, "%s: %d Maniesh", __func__, __LINE__);
     int rc = RETURN_OK;
     int radio_index = 0;
     em_policy_req_type_t policy_type = em_ap_metrics_report_cache.args.policy_type;
@@ -2906,6 +2910,7 @@ void handle_em_command_event(wifi_app_t *app, wifi_event_t *event)
 
 static int em_beacon_report_publish(bus_handle_t *handle, void *msg_data)
 {
+    wifi_util_dbg_print(WIFI_EM, "%s: %d Maniesh", __func__, __LINE__);
     int rc;
     sta_beacon_report_reponse_t *temp_data_t = NULL;
     webconfig_subdoc_data_t *wb_data = NULL;

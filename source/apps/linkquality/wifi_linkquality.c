@@ -43,6 +43,7 @@ static char *wifi_health_log = "/rdklogs/logs/wifihealth.txt";
 /* Register callback BEFORE starting qmgr */
 void publish_qmgr_subdoc(const report_batch_t* report)
 {
+    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d Maniesh", __func__,__LINE__);
     webconfig_subdoc_type_t subdoc_type;
     webconfig_subdoc_data_t *data;
     bus_error_t status;
@@ -263,15 +264,11 @@ int link_quality_unregister_station(wifi_app_t *apps, wifi_event_t *arg)
 
 int link_quality_event_exec_start(wifi_app_t *apps, void *arg)
 {
-      
+    wifi_util_info_print(WIFI_APPS, " %s:%d Maniesh\n", __func__, __LINE__);     
     wifi_util_info_print(WIFI_APPS, "%s:%d\n", __func__, __LINE__);
     wifi_ctrl_t *ctrl = (wifi_ctrl_t *)get_wifictrl_obj();
- 
-    if ( ctrl->network_mode == rdk_dev_mode_type_em_node
-      || ctrl->network_mode == rdk_dev_mode_type_em_colocated_node) {
-        qmgr_register_batch_callback(publish_qmgr_subdoc);
-        wifi_util_info_print(WIFI_APPS, "%s:%d ctrl->network_mode=%d\n", __func__, __LINE__,ctrl->network_mode);
-    } 
+    qmgr_register_batch_callback(publish_qmgr_subdoc);
+    wifi_util_info_print(WIFI_APPS, "%s:%d ctrl->network_mode=%d\n", __func__, __LINE__,ctrl->network_mode);
     start_link_metrics();
     return RETURN_OK;
 }

@@ -2745,6 +2745,7 @@ webconfig_error_t encode_vif_neighbors_object(hash_map_t *neighbors_map, cJSON *
 
 webconfig_error_t encode_radio_channel_radio_params(wifi_provider_response_t *chan_stats, cJSON *radio_stats)
 {
+    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s: %d Maniesh", __func__, __LINE__);
     cJSON *radio_stats_obj;
 
     radio_chan_data_t *chan_data = chan_stats->stat_pointer;
