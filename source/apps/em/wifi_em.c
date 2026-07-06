@@ -453,6 +453,7 @@ static int em_sta_stats_publish(wifi_app_t *app, client_assoc_data_t *stats, int
         wifi_util_error_print(WIFI_EM, "%s:%d Error in encoding assocdev stats\n", __func__,
             __LINE__);
         free(data->u.decoded.em_sta_link_metrics_rsp.per_sta_metrics);
+        webconfig_data_free(data);
         free(data);
         return RETURN_ERR;
     }
@@ -467,6 +468,7 @@ static int em_sta_stats_publish(wifi_app_t *app, client_assoc_data_t *stats, int
         wifi_util_error_print(WIFI_EM, "%s:%d: bus: bus_event_publish_fn Event failed %d\n",
             __func__, __LINE__, rc);
         free(data->u.decoded.em_sta_link_metrics_rsp.per_sta_metrics);
+        webconfig_data_free(data);
         free(data);
         return RETURN_ERR;
     }
@@ -478,6 +480,7 @@ static int em_sta_stats_publish(wifi_app_t *app, client_assoc_data_t *stats, int
     }
 
     free(data->u.decoded.em_sta_link_metrics_rsp.per_sta_metrics);
+    webconfig_data_free(data);
     free(data);
 }
 
@@ -878,6 +881,7 @@ static int em_publish_stats_data(channel_scan_response_t *scan_response)
     if (webconfig_encode(&ctrl->webconfig, data, subdoc_type) != webconfig_error_none) {
         wifi_util_error_print(WIFI_EM, "%s:%d Error in encoding channel scan stats\n", __func__,
             __LINE__);
+        webconfig_data_free(data);
         free(data->u.decoded.collect_stats.stats);
         free(data);
         return RETURN_ERR;
@@ -896,10 +900,12 @@ static int em_publish_stats_data(channel_scan_response_t *scan_response)
     if (status != bus_error_success) {
         wifi_util_error_print(WIFI_EM, "%s:%d: bus: bus_event_publish_fn Event failed %d\n",
             __func__, __LINE__, status);
+        webconfig_data_free(data);
         free(data->u.decoded.collect_stats.stats);
         free(data);
         return RETURN_ERR;
     }
+    webconfig_data_free(data);
     free(data->u.decoded.collect_stats.stats);
     free(data);
 
@@ -1607,6 +1613,8 @@ static int em_handle_disassoc_device(wifi_app_t *app, void *arg)
     wifi_util_dbg_print(WIFI_EM, "%s:%d: Sta Mac %s disassociated\n", __func__,
         __LINE__, sta_mac_str);
 
+    free(stats);
+
     to_mac_str((unsigned char *)assoc_data->dev_stats.cli_MACAddress, client_mac);
     sta_client_info_t *t_sta_data = (sta_client_info_t *)hash_map_remove(
         client_type_info.sta_client_type.client_type_map, client_mac);
@@ -2037,6 +2045,7 @@ cleanup:
                 }
             }
         }
+        webconfig_data_free(data);
         free(data);
     }
 
@@ -2948,6 +2957,7 @@ static int em_beacon_report_publish(bus_handle_t *handle, void *msg_data)
     if (rc != bus_error_success) {
         wifi_util_error_print(WIFI_EM, "%s:%d: bus_event_publish_fn Event failed %d\n", __func__,
             __LINE__, rc);
+        webconfig_data_free(wb_data);
         free(wb_data);
         return RETURN_ERR;
     } else {
@@ -2955,6 +2965,8 @@ static int em_beacon_report_publish(bus_handle_t *handle, void *msg_data)
             __LINE__, WIFI_EM_BEACON_REPORT);
     }
 
+    webconfig_data_free(wb_data);
+    free(wb_data);
     return RETURN_OK;
 }
 
