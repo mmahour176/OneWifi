@@ -1335,7 +1335,10 @@ static int update_vap_info_managed_xfinity(void *data, wifi_vap_info_t *vap_info
     bool connected_building_enabled = false;
     char *blob = cJSON_Print((cJSON *)data);
 
-    root = cJSON_Parse(blob);
+    if (blob) {
+        root = cJSON_Parse(blob);
+        cJSON_free(blob);
+    }
 
     if (root == NULL) {
         wifi_util_error_print(WIFI_CTRL, "%s:Managed xfinity json parse failure\n", __func__);
@@ -1743,6 +1746,7 @@ pErr wifi_vap_cfg_subdoc_handler(void *data)
         cJSON_Delete(root);
         goto finished;
     }
+    cJSON_Delete(root);
     free(execRetVal);
     execRetVal = xfinity_exec_common_handler(vap_blob, webconfig_subdoc_type_xfinity);
 
@@ -2081,6 +2085,12 @@ pErr webconf_process_managed_subdoc(void* data)
 
     wifi_util_info_print(WIFI_CTRL,"Managed guest blob is applied successfuly \n");
     cJSON_Delete(root); // don't need this anymore
+    cJSON_Delete(amenities_blob);
+    cJSON_Delete(vap_blob);
+    cJSON_Delete(xfinity_blob);
+    free(blob_buf);
+    free(msg);
+    msgpack_zone_destroy(&msg_z);
 
     execRetVal->ErrorCode = BLOB_EXEC_SUCCESS;
     return execRetVal;
