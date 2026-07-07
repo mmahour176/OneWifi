@@ -2844,6 +2844,7 @@ bus_error_t apply_ignite_config(char *paramName,
                                 raw_data_t *value,
                                 bus_user_data_t *user_data)
 {
+    wifi_util_dbg_print(WIFI_CTRL, "%s:%d Maniesh", __func__, __LINE__);
     wifi_ctrl_t *ctrl = (wifi_ctrl_t *)get_wifictrl_obj();
     wifi_mgr_t *mgr = (wifi_mgr_t *)get_wifimgr_obj();
     webconfig_subdoc_data_t *data = NULL;
@@ -4157,6 +4158,7 @@ bus_error_t send_action_frame(char *name, raw_data_t *p_data, bus_user_data_t *u
 
 bus_error_t set_force_vap_apply(char *name, raw_data_t *p_data, bus_user_data_t *user_data)
 {
+    wifi_util_dbg_print(WIFI_CTRL, "%s: %d Maniesh", __func__, __LINE__);
     (void)user_data;
     unsigned int idx = 0;
     int ret;

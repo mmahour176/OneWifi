@@ -4661,6 +4661,7 @@ webconfig_error_t translate_statsconfig_from_ovsdb_to_rdk(const struct schema_Wi
 
 webconfig_error_t  translate_config_from_ovsdb_for_stats_config(webconfig_subdoc_data_t *data)
 {
+    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d Maniesh", __func__, __LINE__);
     const struct schema_Wifi_Stats_Config **table;
     struct schema_Wifi_Stats_Config *config_row;
     webconfig_external_ovsdb_t *proto;
@@ -4795,6 +4796,7 @@ webconfig_error_t translate_steerconfig_from_ovsdb_to_rdk(const struct schema_Ba
 
 webconfig_error_t  translate_config_from_ovsdb_for_steering_config(webconfig_subdoc_data_t *data)
 {
+    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d Maniesh", __func__, __LINE__);
     const struct schema_Band_Steering_Config **table;
     struct schema_Band_Steering_Config *config_row;
     webconfig_external_ovsdb_t *proto;
@@ -5153,6 +5155,7 @@ webconfig_error_t translate_steeringclients_from_ovsdb_to_rdk(const struct schem
 
 webconfig_error_t  translate_config_from_ovsdb_for_steering_clients(webconfig_subdoc_data_t *data)
 {
+    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d Maniesh", __func__, __LINE__);
     const struct schema_Band_Steering_Clients **table;
     struct schema_Band_Steering_Clients *client_row;
     webconfig_external_ovsdb_t *proto;
@@ -5256,6 +5259,7 @@ webconfig_error_t translate_vif_neighbors_from_ovsdb_to_rdk(const struct schema_
 
 webconfig_error_t  translate_config_from_ovsdb_for_vif_neighbors(webconfig_subdoc_data_t *data)
 {
+    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d Maniesh", __func__, __LINE__);
     const struct schema_Wifi_VIF_Neighbors **table;
     struct schema_Wifi_VIF_Neighbors *client_row;
     webconfig_external_ovsdb_t *proto;
