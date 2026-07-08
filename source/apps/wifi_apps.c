@@ -361,6 +361,7 @@ wifi_app_descriptor_t app_desc[] = {
     },
 #endif
 #if EM_APP
+#error Maniesh_test
     {
         wifi_app_inst_easymesh, 0,
         wifi_event_type_monitor | wifi_event_type_webconfig | wifi_event_type_hal_ind | wifi_event_type_command,
