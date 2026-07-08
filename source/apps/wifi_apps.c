@@ -360,7 +360,7 @@ wifi_app_descriptor_t app_desc[] = {
         NULL,NULL
     },
 #endif
-#if EM_APP
+#ifndef EM_APP
 #error Maniesh_test
     {
         wifi_app_inst_easymesh, 0,
