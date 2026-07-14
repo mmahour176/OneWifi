@@ -1863,6 +1863,7 @@ static int remove_all_mac_acl_entries_from_cache_and_db(rdk_wifi_vap_info_t *cur
 
 static void destroy_non_aliased_acl_maps(webconfig_subdoc_decoded_data_t *data)
 {
+    wifi_util_info_print(WIFI_MGR, "%s: Entering %s:%d\n", __func__, __FILE__, __LINE__);
     unsigned int radio_index, vap_index;
     wifi_mgr_t *mgr = get_wifimgr_obj();
     rdk_wifi_vap_info_t *decoded_vap;
@@ -1901,6 +1902,7 @@ static void destroy_non_aliased_acl_maps(webconfig_subdoc_decoded_data_t *data)
 
 int webconfig_hal_mac_filter_apply(wifi_ctrl_t *ctrl, webconfig_subdoc_decoded_data_t *data, webconfig_subdoc_type_t subdoc_type)
 {
+    wifi_util_info_print(WIFI_MGR, "%s: Entering %s:%d\n", __func__, __FILE__, __LINE__);
     unsigned int radio_index, vap_index;
     rdk_wifi_vap_info_t *new_config = NULL, *current_config = NULL;
     wifi_mgr_t *mgr = get_wifimgr_obj();
