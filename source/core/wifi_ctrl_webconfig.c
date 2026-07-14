@@ -1868,8 +1868,6 @@ static void destroy_non_aliased_acl_maps(webconfig_subdoc_decoded_data_t *data)
     wifi_mgr_t *mgr = get_wifimgr_obj();
     rdk_wifi_vap_info_t *decoded_vap;
     rdk_wifi_vap_info_t *mgr_vap;
-    acl_entry_t *acl_entry, *temp_acl_entry;
-    mac_addr_str_t mac_str;
 
     for (radio_index = 0; radio_index < getNumberRadios(); radio_index++) {
         for (vap_index = 0; vap_index < getNumberVAPsPerRadio(radio_index); vap_index++) {
@@ -1884,16 +1882,7 @@ static void destroy_non_aliased_acl_maps(webconfig_subdoc_decoded_data_t *data)
                 continue;
             }
 
-            /* Drain entries and destroy the decoded map */
-            acl_entry = hash_map_get_first(decoded_vap->acl_map);
-            while (acl_entry != NULL) {
-                to_mac_str(acl_entry->mac, mac_str);
-                acl_entry = hash_map_get_next(decoded_vap->acl_map, acl_entry);
-                temp_acl_entry = hash_map_remove(decoded_vap->acl_map, mac_str);
-                if (temp_acl_entry != NULL) {
-                    free(temp_acl_entry);
-                }
-            }
+            /* hash_map_destroy frees all keys and values internally */
             hash_map_destroy(decoded_vap->acl_map);
             decoded_vap->acl_map = NULL;
         }
