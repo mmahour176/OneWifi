@@ -473,6 +473,7 @@ int start_radios(rdk_dev_mode_type_t mode, unsigned int radio_index)
     { 
         wifi_util_dbg_print(WIFI_CTRL,"%s:%d ACS KeepOut json_schema at boot up time = %s\n",__FUNCTION__,__LINE__,(char*)keep_out_json);
         process_acs_keep_out_channels_event((char*)keep_out_json);
+        free(keep_out_json);
     }
 
     for (index = 0; index < num_of_radios; index++) {
@@ -1092,15 +1093,13 @@ int scan_results_callback(int radio_index, wifi_bss_info_t **bss, unsigned int *
 {
     scan_results_t  *res;
 
-    if (*num) {
-        // if number of scanned AP's is more than size of res.bss array - truncate
-        if (*num > MAX_SCANNED_VAPS){
-            *num = MAX_SCANNED_VAPS;
-        }
+    if (*num > MAX_SCANNED_VAPS) {
+        *num = MAX_SCANNED_VAPS;
     }
 
-    res = (scan_results_t *)calloc(1, sizeof(scan_results_t));
-    if(!res) {
+    size_t res_size = offsetof(scan_results_t, bss) + (*num) * sizeof(wifi_bss_info_t);
+    res = (scan_results_t *)calloc(1, res_size);
+    if (!res) {
         wifi_util_dbg_print(WIFI_CTRL,"%s:%d Failed to allocate memory for scan_results_t\n", __FUNCTION__, __LINE__);
         return RETURN_ERR;
     }
@@ -1112,7 +1111,7 @@ int scan_results_callback(int radio_index, wifi_bss_info_t **bss, unsigned int *
     }
 
     if (is_sta_enabled()) {
-        if(push_event_to_ctrl_queue(res, sizeof(scan_results_t), wifi_event_type_hal_ind,
+        if (push_event_to_ctrl_queue(res, res_size, wifi_event_type_hal_ind,
             wifi_event_scan_results, NULL) != RETURN_OK) {
             wifi_util_error_print(WIFI_CTRL,"%s:%d Failed to push scan_results to queue\n", __FUNCTION__, __LINE__);
             free(*bss);
@@ -1167,10 +1166,15 @@ int mgmt_wifi_frame_recv(int ap_index, wifi_frame_t *frame)
     wifi_mgmt_frame.frame.token = frame->token;
     wifi_mgmt_frame.frame.recv_freq = frame->recv_freq;
     wifi_mgmt_frame.frame.len = frame->len;
+
+    if (frame->len > MAX_FRAME_SZ) {
+        wifi_util_dbg_print(WIFI_CTRL,"%s:%d frame len %u too large\n", __func__, __LINE__, frame->len);
+        return RETURN_ERR;
+    }
     memcpy(wifi_mgmt_frame.data, frame->data, frame->len);
 
     //In side this API we have allocate memory and send it to control queue
-    push_event_to_ctrl_queue((frame_data_t *)&wifi_mgmt_frame, (sizeof(wifi_mgmt_frame) + frame->len), wifi_event_type_hal_ind, wifi_event_hal_mgmt_frames, NULL);
+    push_event_to_ctrl_queue((frame_data_t *)&wifi_mgmt_frame, sizeof(wifi_mgmt_frame), wifi_event_type_hal_ind, wifi_event_hal_mgmt_frames, NULL);
 
     return RETURN_OK;
 }
@@ -1285,7 +1289,7 @@ int mgmt_wifi_frame_recv(int ap_index, mac_address_t sta_mac, uint8_t *frame, ui
         evt_subtype = wifi_event_hal_csa_beacon_frame;
     }
     if (evt_subtype != wifi_event_hal_unknown_frame) {
-        push_event_to_ctrl_queue((frame_data_t *)&mgmt_frame, sizeof(mgmt_frame), wifi_event_type_hal_ind, evt_subtype, NULL);
+        push_event_to_ctrl_queue((frame_data_t *)&mgmt_frame, offsetof(frame_data_t, data) + len, wifi_event_type_hal_ind, evt_subtype, NULL);
     } else {
         wifi_util_dbg_print(WIFI_CTRL,"%s:%d: Unknown frame type received! skipped push_event_to_ctrl_queue, ap_index:%d, type:%d\n", __func__, __LINE__, ap_index, type);
     }

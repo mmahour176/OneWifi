@@ -495,8 +495,8 @@ typedef struct {
 
 typedef struct {
     unsigned int radio_index;
-    wifi_bss_info_t bss[MAX_SCANNED_VAPS];
     unsigned int num;
+    wifi_bss_info_t bss[MAX_SCANNED_VAPS];
 } scan_results_t;
 
 typedef enum {

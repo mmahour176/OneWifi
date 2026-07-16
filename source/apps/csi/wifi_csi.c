@@ -163,12 +163,19 @@ int csi_start_fn(void* csi_app, unsigned int ap_index, mac_addr_t mac_addr, int 
                 to_hash_map = (csi_mac_data_t *)hash_map_get_first(app->data.u.csi.csi_sounding_mac_map);
                 while(to_hash_map != NULL) {
                     if ((to_hash_map->subscribed_apps & ~wifi_app_inst_motion)){
+                        mac_addr_str_t victim_str = { 0 };
+                        if (to_hash_map->is_mlo) {
+                            to_mac_str((unsigned char *)to_hash_map->link_addr, victim_str);
+                        } else {
+                            to_mac_str((unsigned char *)to_hash_map->mac_addr, victim_str);
+                        }
                         wifi_util_info_print(WIFI_APPS, "%s:%d Disabling CSI for mac %02x..%02x\n", __func__, __LINE__, to_hash_map->mac_addr[0], to_hash_map->mac_addr[5]);
                         wifi_enableCSIEngine(to_hash_map->ap_index, to_hash_map->mac_addr, FALSE);
                         update_pinger_config(to_hash_map->ap_index, to_hash_map->mac_addr, true);
-                        to_hash_map = (csi_mac_data_t *)hash_map_remove(app->data.u.csi.csi_sounding_mac_map, mac_str);
+                        to_hash_map = (csi_mac_data_t *)hash_map_remove(app->data.u.csi.csi_sounding_mac_map, victim_str);
                         if (to_hash_map != NULL) {
                             free(to_hash_map);
+                            app->data.u.csi.num_current_sounding--;
                         }
                         enable_sounding = true;
                         break;

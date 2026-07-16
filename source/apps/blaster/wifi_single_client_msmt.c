@@ -1942,6 +1942,15 @@ void stream_client_msmt_data(bool ActiveMsmtFlag)
             upload_single_client_active_msmt_data(sta);
         } else if (ctrl->network_mode == rdk_dev_mode_type_ext) {
             pod_upload_single_client_active_msmt_data(sta);
+            pthread_mutex_lock(&act_monitor->lock);
+            sta = hash_map_remove(blaster_map, sta_key);
+            pthread_mutex_unlock(&act_monitor->lock);
+            if (sta != NULL) {
+                if (sta->sta_active_msmt_data != NULL) {
+                    free(sta->sta_active_msmt_data);
+                }
+                free(sta);
+            }
         }
     }
 }
