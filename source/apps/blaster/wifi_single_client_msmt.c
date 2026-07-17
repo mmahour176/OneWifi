@@ -1908,6 +1908,7 @@ Error:
 
 void stream_client_msmt_data(bool ActiveMsmtFlag)
 {
+    wifi_util_dbg_print(WIFI_BLASTER, "%s:%d Maniesh Entering ", __func__, __LINE__);
     if (ActiveMsmtFlag)
     {
         wifi_actvie_msmt_t *act_monitor;

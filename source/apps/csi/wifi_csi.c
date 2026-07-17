@@ -105,6 +105,7 @@ void update_pinger_config(int ap_index, mac_addr_t mac_addr, bool pause_pinger)
 
 int csi_start_fn(void* csi_app, unsigned int ap_index, mac_addr_t mac_addr, int sounding_app)
 {
+    wifi_util_dbg_print(WIFI_APPS, "%s:%d Maniesh Entering\n", __func__, __LINE__);
     mac_addr_str_t mac_str = { 0 };
     csi_mac_data_t *to_hash_map = NULL;
     bool enable_sounding = false;

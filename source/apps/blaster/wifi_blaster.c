@@ -2366,6 +2366,7 @@ int blaster_init(wifi_app_t *app, unsigned int create_flag)
 
 int blaster_deinit(wifi_app_t *app)
 {
+    wifi_util_dbg_print(WIFI_BLASTER,"%s:%d Maniesh Entering\n", __func__, __LINE__);
     if (app->data.u.blaster.g_active_msmt.worker_thread_id != 0) {
         pthread_cancel(app->data.u.blaster.g_active_msmt.worker_thread_id);
     }

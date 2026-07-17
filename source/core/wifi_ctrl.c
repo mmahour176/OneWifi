@@ -454,6 +454,7 @@ unsigned int dfs_fallback_channel(wifi_platform_property_t *wifi_prop, wifi_freq
 
 int start_radios(rdk_dev_mode_type_t mode, unsigned int radio_index)
 {
+    wifi_util_dbg_print(WIFI_CTRL, "%s:%d Maniesh Entering \n", __func__, __LINE__);
     wifi_radio_operationParam_t *wifi_radio_oper_param = NULL;
     int ret = RETURN_OK;
     uint8_t index = 0;
@@ -1091,6 +1092,7 @@ int start_wifi_health_monitor_thread(void)
 
 int scan_results_callback(int radio_index, wifi_bss_info_t **bss, unsigned int *num)
 {
+    wifi_util_dbg_print(WIFI_CTRL, "%s:%d Maniesh Entering\n", __func__, __LINE__);
     scan_results_t  *res;
 
     if (*num > MAX_SCANNED_VAPS) {
@@ -1154,6 +1156,7 @@ int sta_connection_status(int apIndex, wifi_bss_info_t *bss_dev, wifi_station_st
 #ifdef WIFI_HAL_VERSION_3_PHASE2
 int mgmt_wifi_frame_recv(int ap_index, wifi_frame_t *frame)
 {
+    wifi_util_dbg_print(WIFI_CTRL, "%s:%d Maniesh Entering\n", __func__, __LINE__);
     frame_data_t wifi_mgmt_frame;
 
     memset(&wifi_mgmt_frame, 0, sizeof(wifi_mgmt_frame));
