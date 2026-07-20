@@ -1869,8 +1869,8 @@ static void destroy_non_aliased_acl_maps(webconfig_subdoc_decoded_data_t *data)
     rdk_wifi_vap_info_t *decoded_vap;
     rdk_wifi_vap_info_t *mgr_vap;
 
-    for (radio_index = 0; radio_index < getNumberRadios(); radio_index++) {
-        for (vap_index = 0; vap_index < getNumberVAPsPerRadio(radio_index); vap_index++) {
+    for (radio_index = 0; radio_index < data->num_radios; radio_index++) {
+        for (vap_index = 0; vap_index < data->radios[radio_index].vaps.num_vaps; vap_index++) {
             decoded_vap = &data->radios[radio_index].vaps.rdk_vap_array[vap_index];
             mgr_vap = &mgr->radio_config[radio_index].vaps.rdk_vap_array[vap_index];
 
