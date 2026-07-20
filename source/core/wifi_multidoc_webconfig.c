@@ -2008,60 +2008,83 @@ pErr webconf_process_managed_subdoc(void* data)
         return execRetVal;
     }
 
-    /*
-     * From this point on, resources that may be individually detached/allocated
-     * are tracked and released through a single cleanup block to avoid leaks on
-     * any error path.
-     */
-    cJSON *amenities_blob = NULL;
-    cJSON *vap_blob       = NULL;
-    cJSON *xfinity_blob   = NULL;
-
     cJSON *managed_wifi_enabled = cJSON_GetObjectItem(root, "ManagedWifiEnabled");
     if (managed_wifi_enabled == NULL) {
+        msgpack_zone_destroy(&msg_z);
         execRetVal->ErrorCode = VALIDATION_FALIED;
         strncpy(execRetVal->ErrorMsg, "Failed to Get ManagedWifiEnabled", sizeof(execRetVal->ErrorMsg)-1);
+        free(blob_buf);
+        free(msg);
+        cJSON_Delete(root);
         wifi_util_error_print(WIFI_CTRL, "%s: Failed to Get ManagedWifiEnabled\n", __func__);
-        goto cleanup;
+        return execRetVal;
     }
     connected_wifi_enabled = cJSON_IsTrue(managed_wifi_enabled)? true : false;
     wifi_util_dbg_print(WIFI_CTRL,"managed_wifi_enabled is %d\n",connected_wifi_enabled);
 
-    amenities_blob = cJSON_DetachItemFromObject(root, "AmenitiesNetworkConfig");
+    cJSON *amenities_blob = cJSON_DetachItemFromObject(root, "AmenitiesNetworkConfig");
     if (amenities_blob == NULL) {
+        msgpack_zone_destroy(&msg_z);
         execRetVal->ErrorCode = VALIDATION_FALIED;
         strncpy(execRetVal->ErrorMsg, "Failed to detach AmenitiesNetworkConfig", sizeof(execRetVal->ErrorMsg)-1);
+        free(blob_buf);
+        free(msg);
+        cJSON_Delete(root);
         wifi_util_error_print(WIFI_CTRL, "%s: Failed to detach AmenitiesNetworkConfig\n", __func__);
-        goto cleanup;
+        return execRetVal;
     }
 
-    vap_blob = cJSON_DetachItemFromObject(root, "WifiVapConfig");
+    cJSON *vap_blob = cJSON_DetachItemFromObject(root, "WifiVapConfig");
     if(vap_blob == NULL) {
+        msgpack_zone_destroy(&msg_z);
         execRetVal->ErrorCode = VALIDATION_FALIED;
         strncpy(execRetVal->ErrorMsg, "Failed to detach WifiVapConfig", sizeof(execRetVal->ErrorMsg)-1);
+        free(blob_buf);
+        free(msg);
+        cJSON_Delete(amenities_blob);
+        cJSON_Delete(root);
         wifi_util_error_print(WIFI_CTRL, "%s: Failed to detach WifiVapConfig\n", __func__);
-        goto cleanup;
+        return execRetVal;
     }
-    ret = connected_subdoc_handler(vap_blob, amenities_blob, VAP_PREFIX_LNF_PSK, webconfig_subdoc_type_lnf, connected_wifi_enabled, execRetVal);
+    ret = connected_subdoc_handler(vap_blob, amenities_blob, VAP_PREFIX_LNF_PSK, webconfig_subdoc_type_lnf, connected_wifi_enabled,  execRetVal);
     if (ret != RETURN_OK) {
+        msgpack_zone_destroy(&msg_z);
         execRetVal->ErrorCode = VALIDATION_FALIED;
+        free(blob_buf);
+        free(msg);
+        cJSON_Delete(amenities_blob);
+        cJSON_Delete(vap_blob);
+        cJSON_Delete(root);
         wifi_util_error_print(WIFI_CTRL, "%s: connected_subdoc_handler failed for lnf vaps\n", __func__);
-        goto cleanup;
+        return execRetVal;
     }
 
-    xfinity_blob = cJSON_DetachItemFromObject(root, "xfinityWifiVapConfig");
+    cJSON *xfinity_blob = cJSON_DetachItemFromObject(root, "xfinityWifiVapConfig");
     if(xfinity_blob == NULL) {
+        msgpack_zone_destroy(&msg_z);
         execRetVal->ErrorCode = VALIDATION_FALIED;
         strncpy(execRetVal->ErrorMsg, "Failed to detach xfinity_blob", sizeof(execRetVal->ErrorMsg)-1);
+        free(blob_buf);
+        free(msg);
+        cJSON_Delete(amenities_blob);
+        cJSON_Delete(vap_blob);
+        cJSON_Delete(root);
         wifi_util_error_print(WIFI_CTRL, "%s: Failed to detach xfinityWifiVapConfig\n", __func__);
-        goto cleanup;
+        return execRetVal;
     }
 
     ret = connected_subdoc_handler(xfinity_blob, NULL, VAP_PREFIX_HOTSPOT, webconfig_subdoc_type_xfinity, connected_wifi_enabled, execRetVal);
     if (ret != RETURN_OK) {
+        msgpack_zone_destroy(&msg_z);
         execRetVal->ErrorCode = VALIDATION_FALIED;
+        free(blob_buf);
+        free(msg);
+        cJSON_Delete(amenities_blob);
+        cJSON_Delete(vap_blob);
+        cJSON_Delete(xfinity_blob);
+        cJSON_Delete(root);
         wifi_util_error_print(WIFI_CTRL, "%s: Failed to update connectedbuilding AVPs in Xfinity vaps\n", __func__);
-        goto cleanup;
+        return execRetVal;
     }
 
     if (connected_wifi_enabled) {
@@ -2071,23 +2094,15 @@ pErr webconf_process_managed_subdoc(void* data)
     }
 
     wifi_util_info_print(WIFI_CTRL,"Managed guest blob is applied successfuly \n");
-    execRetVal->ErrorCode = BLOB_EXEC_SUCCESS;
-
-cleanup:
+    cJSON_Delete(amenities_blob);
+    cJSON_Delete(vap_blob);
+    cJSON_Delete(xfinity_blob);
     cJSON_Delete(root);
-    if (amenities_blob != NULL) {
-        cJSON_Delete(amenities_blob);
-    }
-    if (vap_blob != NULL) {
-        cJSON_Delete(vap_blob);
-    }
-    if (xfinity_blob != NULL) {
-        cJSON_Delete(xfinity_blob);
-    }
     free(blob_buf);
     free(msg);
     msgpack_zone_destroy(&msg_z);
 
+    execRetVal->ErrorCode = BLOB_EXEC_SUCCESS;
     return execRetVal;
 }
 
