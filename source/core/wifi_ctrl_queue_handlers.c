@@ -4710,7 +4710,6 @@ void handle_webconfig_event(wifi_ctrl_t *ctrl, const char *raw, unsigned int len
 
         json = cJSON_Parse(raw);
         subdoc_type = find_subdoc_type(config, json);
-        cJSON_Delete(json);
         switch (subdoc_type) {
         case webconfig_subdoc_type_private:
             num_ssid += get_list_of_private_ssid(&mgr->hal_cap.wifi_prop, MAX_NUM_RADIOS,
@@ -4750,6 +4749,7 @@ void handle_webconfig_event(wifi_ctrl_t *ctrl, const char *raw, unsigned int len
         }
 
         apps_mgr_analytics_event(&ctrl->apps_mgr, wifi_event_type_webconfig, subtype, NULL);
+        data->u.encoded.json = json;
         webconfig_decode(config, data, raw);
         wifi_event = (wifi_event_t *)malloc(sizeof(wifi_event_t));
         if (wifi_event != NULL) {

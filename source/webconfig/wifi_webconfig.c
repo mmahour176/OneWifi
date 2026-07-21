@@ -71,6 +71,8 @@ webconfig_error_t webconfig_decode(webconfig_t *config, webconfig_subdoc_data_t 
     data->u.encoded.raw = (webconfig_subdoc_encoded_raw_t)calloc(strlen(str) + 1, sizeof(char));
     if (data->u.encoded.raw == NULL) {
         wifi_util_error_print(WIFI_WEBCONFIG,"%s:%d Failed to allocate memory.\n", __func__,__LINE__);
+        cJSON_Delete(data->u.encoded.json);
+        data->u.encoded.json = NULL;
         return webconfig_error_decode;
     }
 
@@ -160,7 +162,9 @@ bool validate_subdoc_data(webconfig_t *config, webconfig_subdoc_data_t *data)
         }
     } else if ((data->descriptor & webconfig_data_descriptor_encoded) == webconfig_data_descriptor_encoded) {
         // data is encoded in the form of json
-        data->u.encoded.json = cJSON_Parse(data->u.encoded.raw);
+        if (data->u.encoded.json == NULL) {
+            data->u.encoded.json = cJSON_Parse(data->u.encoded.raw);
+        }
         if (data->u.encoded.json == NULL) {
             wifi_util_error_print(WIFI_WEBCONFIG,"%s:%d: Could not parse raw data\n", __func__, __LINE__);
             return false;
@@ -169,6 +173,7 @@ bool validate_subdoc_data(webconfig_t *config, webconfig_subdoc_data_t *data)
         if ((type = find_subdoc_type(config, data->u.encoded.json)) == webconfig_subdoc_type_unknown) {
             wifi_util_error_print(WIFI_WEBCONFIG,"%s:%d: Invalid value for subdoc", __func__, __LINE__);
             cJSON_Delete(data->u.encoded.json);
+            data->u.encoded.json = NULL;
             return false;
         }
 
@@ -189,6 +194,8 @@ webconfig_error_t webconfig_set(webconfig_t *config, webconfig_subdoc_data_t *da
 
     if (validate_subdoc_data(config, data) == false) {
         wifi_util_error_print(WIFI_WEBCONFIG,"%s:%d: Invalid data .. not parsable\n", __func__, __LINE__);
+        cJSON_Delete(data->u.encoded.json);
+        data->u.encoded.json = NULL;
         return webconfig_error_invalid_subdoc;
     }
 
@@ -196,6 +203,7 @@ webconfig_error_t webconfig_set(webconfig_t *config, webconfig_subdoc_data_t *da
     if (doc->access_check_subdoc(config, data) != webconfig_error_none) {
         wifi_util_error_print(WIFI_WEBCONFIG, "%s:%d: invalid access for subdocument type:%d in entity:%d\n",
             __func__, __LINE__, doc->type, config->initializer);
+        data->u.encoded.json = NULL;
         return webconfig_error_not_permitted;
     }
 
@@ -223,6 +231,7 @@ webconfig_error_t webconfig_set(webconfig_t *config, webconfig_subdoc_data_t *da
 
 
     data->descriptor = 0;
+    data->u.encoded.json = NULL;
 
     return err;
 

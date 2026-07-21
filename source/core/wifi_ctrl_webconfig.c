@@ -163,6 +163,16 @@ void webconfig_init_subdoc_data(webconfig_subdoc_data_t *data)
     data->u.decoded.num_radios = getNumberRadios();
 }
 
+void webconfig_init_subdoc_data_min(webconfig_subdoc_data_t *data)
+{
+    wifi_mgr_t *mgr = get_wifimgr_obj();
+
+    memset(data, 0, sizeof(webconfig_subdoc_data_t));
+    memcpy((unsigned char *)&data->u.decoded.config, (unsigned char *)&mgr->global_config, sizeof(wifi_global_config_t));
+    memcpy((unsigned char *)&data->u.decoded.hal_cap, (unsigned char *)&mgr->hal_cap, sizeof(wifi_hal_capability_t));
+    data->u.decoded.num_radios = getNumberRadios();
+}
+
 int update_vap_params_to_hal_and_db(wifi_vap_info_t *vap, bool enable_or_disable) {
     if (!vap) {
         return RETURN_ERR;
@@ -445,7 +455,7 @@ int webconfig_send_steering_clients_status(wifi_ctrl_t *ctrl)
         return RETURN_ERR;
     }
 
-    webconfig_init_subdoc_data(data);
+    webconfig_init_subdoc_data_min(data);
 
     if (webconfig_encode(&ctrl->webconfig, data, webconfig_subdoc_type_steering_clients) != webconfig_error_none) {
         wifi_util_dbg_print(WIFI_CTRL, "%s:%d - Failed webconfig_encode\n", __FUNCTION__, __LINE__);
@@ -2731,6 +2741,9 @@ int push_data_to_apply_pending_queue(webconfig_subdoc_data_t *data)
 {
     wifi_ctrl_t *ctrl = (wifi_ctrl_t *)get_wifictrl_obj();
     webconfig_subdoc_data_t *temp_data;
+    /* decoded maps are rebuilt from raw on re-apply; free fresh ones now or they orphan.
+       Alias-aware: skips maps shared with mgr->radio_config (see line-1982 helper). */
+    webconfig_free_decoded_acl_maps(&data->u.decoded);
     temp_data = (webconfig_subdoc_data_t *)malloc(sizeof(webconfig_subdoc_data_t));
     if (temp_data == NULL) {
         wifi_util_error_print(WIFI_CTRL, "%s:%d: Unable to allocate memory for subdoc_data type:%d\n", __func__, __LINE__, data->type);
@@ -2738,6 +2751,11 @@ int push_data_to_apply_pending_queue(webconfig_subdoc_data_t *data)
     }
     memcpy(temp_data, data, sizeof(webconfig_subdoc_data_t));
     temp_data->u.encoded.raw = strdup(data->u.encoded.raw);
+    if (temp_data->u.encoded.raw == NULL) {
+        free(temp_data);
+        return RETURN_ERR;
+    }
+    temp_data->u.encoded.json = NULL; /* stale cJSON tree pointer: validate_subdoc_data parsed it, decoders cJSON_Delete'd without NULLing the field */
     queue_push(ctrl->vif_apply_pending_queue, temp_data);
     apps_mgr_analytics_event(&ctrl->apps_mgr, wifi_event_type_webconfig, wifi_event_webconfig_data_to_apply_pending_queue, data);
     return RETURN_OK;
