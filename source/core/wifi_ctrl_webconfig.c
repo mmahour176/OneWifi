@@ -1861,30 +1861,20 @@ static int remove_all_mac_acl_entries_from_cache_and_db(rdk_wifi_vap_info_t *cur
     return RETURN_OK;
 }
 
-static void destroy_non_aliased_acl_maps(webconfig_subdoc_decoded_data_t *data)
+void webconfig_free_decoded_acl_maps(webconfig_subdoc_decoded_data_t *decoded)
 {
-    wifi_util_info_print(WIFI_MGR, "%s: Entering %s:%d\n", __func__, __FILE__, __LINE__);
-    unsigned int radio_index, vap_index;
+    unsigned int r, v;
     wifi_mgr_t *mgr = get_wifimgr_obj();
-    rdk_wifi_vap_info_t *decoded_vap;
-    rdk_wifi_vap_info_t *mgr_vap;
+    rdk_wifi_vap_info_t *dec_vap, *mgr_vap;
 
-    for (radio_index = 0; radio_index < data->num_radios; radio_index++) {
-        for (vap_index = 0; vap_index < data->radios[radio_index].vaps.num_vaps; vap_index++) {
-            decoded_vap = &data->radios[radio_index].vaps.rdk_vap_array[vap_index];
-            mgr_vap = &mgr->radio_config[radio_index].vaps.rdk_vap_array[vap_index];
-
-            if (decoded_vap->acl_map == NULL) {
-                continue;
+    for (r = 0; r < getNumberRadios(); r++) {
+        for (v = 0; v < getNumberVAPsPerRadio(r); v++) {
+            dec_vap = &decoded->radios[r].vaps.rdk_vap_array[v];
+            mgr_vap = &mgr->radio_config[r].vaps.rdk_vap_array[v];
+            if (dec_vap->acl_map != NULL && dec_vap->acl_map != mgr_vap->acl_map) {
+                hash_map_destroy(dec_vap->acl_map); /* frees keys+entries (collection.c:355-369); acl_entry_t (include/wifi_base.h:1065) is a single packed malloc block */
             }
-            /* Skip aliased maps — the mgr owns these */
-            if (decoded_vap->acl_map == mgr_vap->acl_map) {
-                continue;
-            }
-
-            /* hash_map_destroy frees all keys and values internally */
-            hash_map_destroy(decoded_vap->acl_map);
-            decoded_vap->acl_map = NULL;
+            dec_vap->acl_map = NULL; /* decoded copy only; mgr's own pointer untouched */
         }
     }
 }
@@ -2009,7 +1999,7 @@ int webconfig_hal_mac_filter_apply(wifi_ctrl_t *ctrl, webconfig_subdoc_decoded_d
     }
 
     /* Free all decoded ACL maps that are not aliased to the mgr's live cache */
-    destroy_non_aliased_acl_maps(data);
+    webconfig_free_decoded_acl_maps(data);
     return ret;
 }
 
