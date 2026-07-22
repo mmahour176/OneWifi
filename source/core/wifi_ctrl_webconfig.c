@@ -165,6 +165,7 @@ void webconfig_init_subdoc_data(webconfig_subdoc_data_t *data)
 
 void webconfig_init_subdoc_data_min(webconfig_subdoc_data_t *data)
 {
+    wifi_util_info_print(WIFI_CTRL,"%s:%d Maniesh entry\n", __func__, __LINE__);
     wifi_mgr_t *mgr = get_wifimgr_obj();
 
     memset(data, 0, sizeof(webconfig_subdoc_data_t));
@@ -446,6 +447,7 @@ int webconfig_send_blaster_status(wifi_ctrl_t *ctrl)
 
 int webconfig_send_steering_clients_status(wifi_ctrl_t *ctrl)
 {
+    wifi_util_info_print(WIFI_CTRL, "%s:%d Maniesh entry\n", __func__, __LINE__);
     webconfig_subdoc_data_t *data = NULL;
 
     data = malloc(sizeof(webconfig_subdoc_data_t));
@@ -464,11 +466,13 @@ int webconfig_send_steering_clients_status(wifi_ctrl_t *ctrl)
     webconfig_data_free(data);
     free(data);
     data = NULL;
+    wifi_util_info_print(WIFI_CTRL, "%s:%d Maniesh exit", __func__, __LINE__);
     return RETURN_OK;
 }
 
 int webconfig_send_multivap_subdoc_status(wifi_ctrl_t *ctrl, webconfig_subdoc_type_t type)
 {
+    wifi_util_info_print(WIFI_CTRL, "%s:%d Maniesh entry", __func__, __LINE__);
     webconfig_subdoc_data_t *data = NULL;
 
     data = malloc(sizeof(webconfig_subdoc_data_t));
@@ -2739,6 +2743,7 @@ int webconfig_hal_single_radio_apply(wifi_ctrl_t *ctrl, webconfig_subdoc_decoded
 
 int push_data_to_apply_pending_queue(webconfig_subdoc_data_t *data)
 {
+    wifi_util_dbg_print(WIFI_CTRL, "%s:%d Maniesh entry", __func__, __LINE__);
     wifi_ctrl_t *ctrl = (wifi_ctrl_t *)get_wifictrl_obj();
     webconfig_subdoc_data_t *temp_data;
     /* decoded maps are rebuilt from raw on re-apply; free fresh ones now or they orphan.
@@ -2758,6 +2763,7 @@ int push_data_to_apply_pending_queue(webconfig_subdoc_data_t *data)
     temp_data->u.encoded.json = NULL; /* stale cJSON tree pointer: validate_subdoc_data parsed it, decoders cJSON_Delete'd without NULLing the field */
     queue_push(ctrl->vif_apply_pending_queue, temp_data);
     apps_mgr_analytics_event(&ctrl->apps_mgr, wifi_event_type_webconfig, wifi_event_webconfig_data_to_apply_pending_queue, data);
+    wifi_util_dbg_print(WIFI_CTRL, "%s:%d Maniesh exit", __func__, __LINE__);
     return RETURN_OK;
 }
 

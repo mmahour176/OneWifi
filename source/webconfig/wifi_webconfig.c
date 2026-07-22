@@ -66,6 +66,7 @@ webconfig_error_t webconfig_encode(webconfig_t *config, webconfig_subdoc_data_t 
 
 webconfig_error_t webconfig_decode(webconfig_t *config, webconfig_subdoc_data_t *data, const char *str)
 {
+    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d Maniesh entry\n", __func__, __LINE__);
     webconfig_error_t ret = webconfig_error_none;
 
     data->u.encoded.raw = (webconfig_subdoc_encoded_raw_t)calloc(strlen(str) + 1, sizeof(char));
@@ -86,6 +87,7 @@ webconfig_error_t webconfig_decode(webconfig_t *config, webconfig_subdoc_data_t 
     if (ret != webconfig_error_none) {
         webconfig_data_free(data);
     }
+    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d Maniesh exit\n", __func__, __LINE__);
 
     return ret;
 }
@@ -140,6 +142,7 @@ char *webconfig_get(webconfig_t * config)
 
 bool validate_subdoc_data(webconfig_t *config, webconfig_subdoc_data_t *data)
 {
+    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d Maniesh entry\n", __func__, __LINE__);
     webconfig_subdoc_type_t type;
 
     if (data->signature != WEBCONFIG_MAGIC_SIGNATUTRE) {
@@ -183,12 +186,13 @@ bool validate_subdoc_data(webconfig_t *config, webconfig_subdoc_data_t *data)
         wifi_util_error_print(WIFI_WEBCONFIG, "%s:%d: webconfig subdoc data validation failed\n", __func__, __LINE__);
         return false;
     }
-
+    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d Maniesh exit\n", __func__, __LINE__);
     return true;
 }
 
 webconfig_error_t webconfig_set(webconfig_t *config, webconfig_subdoc_data_t *data)
 {
+    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d Maniesh entry\n", __func__, __LINE__);
     webconfig_subdoc_t  *doc;
     webconfig_error_t err = RETURN_OK;
 
@@ -232,7 +236,7 @@ webconfig_error_t webconfig_set(webconfig_t *config, webconfig_subdoc_data_t *da
 
     data->descriptor = 0;
     data->u.encoded.json = NULL;
-
+    wifi_util_dbg_print(WIFI_WEBCONFIG, "%s:%d Maniesh exit\n", __func__, __LINE__);
     return err;
 
 }

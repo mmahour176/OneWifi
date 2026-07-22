@@ -4675,6 +4675,7 @@ int free_webconfig_msg_payload(wifi_event_subtype_t sub_type, webconfig_subdoc_d
 void handle_webconfig_event(wifi_ctrl_t *ctrl, const char *raw, unsigned int len,
     wifi_event_subtype_t subtype)
 {
+    wifi_util_dbg_print(WIFI_CTRL, "%s:%d: Maniesh Entry\n", __func__, __LINE__);
     webconfig_t *config;
     webconfig_subdoc_data_t *data = NULL;
     wifi_mgr_t *mgr = (wifi_mgr_t *)get_wifimgr_obj();
@@ -4844,6 +4845,7 @@ void handle_webconfig_event(wifi_ctrl_t *ctrl, const char *raw, unsigned int len
 
     free(data);
     data = NULL;
+    wifi_util_dbg_print(WIFI_CTRL, "%s:%d: Maniesh Exit\n", __func__, __LINE__);
 }
 
 void handle_wifiapi_event(void *data, unsigned int len, wifi_event_subtype_t subtype)
