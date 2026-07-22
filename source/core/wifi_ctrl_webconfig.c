@@ -1982,6 +1982,25 @@ static int remove_all_mac_acl_entries_from_cache_and_db(rdk_wifi_vap_info_t *cur
     return RETURN_OK;
 }
 
+void webconfig_free_decoded_acl_maps(webconfig_subdoc_decoded_data_t *decoded)
+{
+    wifi_util_dbg_print(WIFI_CTRL, "%s:%d Maniesh Entry\n", __func__, __LINE__);
+    unsigned int r, v;
+    wifi_mgr_t *mgr = get_wifimgr_obj();
+    rdk_wifi_vap_info_t *dec_vap, *mgr_vap;
+
+    for (r = 0; r < getNumberRadios(); r++) {
+        for (v = 0; v < getNumberVAPsPerRadio(r); v++) {
+            dec_vap = &decoded->radios[r].vaps.rdk_vap_array[v];
+            mgr_vap = &mgr->radio_config[r].vaps.rdk_vap_array[v];
+            if (dec_vap->acl_map != NULL && dec_vap->acl_map != mgr_vap->acl_map) {
+                hash_map_destroy(dec_vap->acl_map); /* frees keys+entries (collection.c:355-369); acl_entry_t (include/wifi_base.h:1065) is a single packed malloc block */
+            }
+            dec_vap->acl_map = NULL; /* decoded copy only; mgr's own pointer untouched */
+        }
+    }
+}
+
 int webconfig_hal_mac_filter_apply(wifi_ctrl_t *ctrl, webconfig_subdoc_decoded_data_t *data, webconfig_subdoc_type_t subdoc_type)
 {
     unsigned int radio_index, vap_index;
