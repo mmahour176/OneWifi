@@ -2032,7 +2032,6 @@ pErr webconf_process_managed_subdoc(void* data)
         strncpy(execRetVal->ErrorMsg, "Failed to detach WifiVapConfig", sizeof(execRetVal->ErrorMsg)-1);
         free(blob_buf);
         free(msg);
-        cJSON_Delete(amenities_blob);
         cJSON_Delete(root);
         wifi_util_error_print(WIFI_CTRL, "%s: Failed to detach WifiVapConfig\n", __func__);
         return execRetVal;
@@ -2042,14 +2041,12 @@ pErr webconf_process_managed_subdoc(void* data)
         msgpack_zone_destroy(&msg_z);
         execRetVal->ErrorCode = VALIDATION_FALIED;
         free(blob_buf);
-        free(msg);
         cJSON_Delete(amenities_blob);
         cJSON_Delete(vap_blob);
         cJSON_Delete(root);
-        wifi_util_error_print(WIFI_CTRL, "%s: connected_subdoc_handler failed for lnf vaps\n", __func__);
+        wifi_util_error_print(WIFI_CTRL, "%s: Failed to detach xfinity_blob\n", __func__);
         return execRetVal;
     }
-
     cJSON *xfinity_blob = cJSON_DetachItemFromObject(root, "xfinityWifiVapConfig");
     if(xfinity_blob == NULL) {
         msgpack_zone_destroy(&msg_z);
@@ -2060,7 +2057,7 @@ pErr webconf_process_managed_subdoc(void* data)
         cJSON_Delete(amenities_blob);
         cJSON_Delete(vap_blob);
         cJSON_Delete(root);
-        wifi_util_error_print(WIFI_CTRL, "%s: Failed to detach xfinityWifiVapConfig\n", __func__);
+        wifi_util_error_print(WIFI_CTRL, "%s: Failed to detach xfinity_blob\n", __func__);
         return execRetVal;
     }
 
@@ -2074,10 +2071,9 @@ pErr webconf_process_managed_subdoc(void* data)
         cJSON_Delete(vap_blob);
         cJSON_Delete(xfinity_blob);
         cJSON_Delete(root);
-        wifi_util_error_print(WIFI_CTRL, "%s: Failed to update connectedbuilding AVPs in Xfinity vaps\n", __func__);
+        wifi_util_error_print(WIFI_CTRL, "%s: Failed to update connectedbuilding AVPs in  Xfinity vaps \n", __func__);
         return execRetVal;
     }
-
     if (connected_wifi_enabled) {
         wifi_util_info_print(WIFI_CTRL,"lnf_psk vaps are repurposed to managed_guest\n");
     } else {
