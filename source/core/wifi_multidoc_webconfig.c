@@ -1330,14 +1330,21 @@ done:
 static int update_vap_info_managed_xfinity(void *data, wifi_vap_info_t *vap_info, pErr execRetVal)
 {
     int status = RETURN_OK;
+    cJSON *root = NULL;
     cJSON *param = NULL;
     bool connected_building_enabled = false;
+    char *blob = cJSON_Print((cJSON *)data);
 
-    if (data == NULL) {
-        return RETURN_ERR;
+    if(blob) {
+        root = cJSON_Parse(blob);
+        cJSON_free(blob);
     }
 
-    param = cJSON_GetObjectItem((cJSON *)data, "connected_building_enabled");
+    if (root == NULL) {
+        wifi_util_error_print(WIFI_CTRL, "%s:Managed xfinity json parse failure\n", __func__);
+        return RETURN_ERR;
+    }
+    param = cJSON_GetObjectItem(root, "connected_building_enabled");
 
     if (param) {
         if (cJSON_IsBool(param)) {
@@ -1345,6 +1352,7 @@ static int update_vap_info_managed_xfinity(void *data, wifi_vap_info_t *vap_info
             wifi_util_dbg_print(WIFI_CTRL, "   \"connected_building_enabled\": %s\n", (connected_building_enabled) ? "true" : "false");
         } else {
             wifi_util_dbg_print(WIFI_CTRL, "%s: \"connected_building_enabled\" is not boolean\n", __func__);
+            cJSON_Delete(root);
             return RETURN_ERR;
         }
     } else {
@@ -1352,6 +1360,7 @@ static int update_vap_info_managed_xfinity(void *data, wifi_vap_info_t *vap_info
     }
     vap_info->u.bss_info.connected_building_enabled = connected_building_enabled;
     wifi_util_info_print(WIFI_CTRL, "  LINE %d \"connected_building_enabled\": %s and vap_name=%s\n", __LINE__,(vap_info->u.bss_info.connected_building_enabled) ? "true" : "false",vap_info->vap_name);
+    cJSON_Delete(root);
     return status;
 }
 
