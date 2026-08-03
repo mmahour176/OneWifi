@@ -3473,6 +3473,7 @@ int create_station_with_default_credentials(webconfig_subdoc_data_t *data, int n
 
 void start_station_vaps(bool is_private, bool rf_status)
 {
+    wifi_util_dbg_print(WIFI_CTRL, "%s:%d: Manish Entering\n", __func__, __LINE__);
     webconfig_subdoc_data_t *data = NULL;
     char *str;
     unsigned int private_num_vaps = 0;
@@ -3518,6 +3519,7 @@ void start_station_vaps(bool is_private, bool rf_status)
 
     webconfig_data_free(data);
     free(data);
+    wifi_util_dbg_print(WIFI_CTRL, "%s:%d: Manish Exiting", __func__, __LINE__);
 }
 
 // register subdocs with webconfig_framework

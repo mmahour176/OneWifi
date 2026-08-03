@@ -326,6 +326,7 @@ void copy_chanstats_to_chandata(radio_chan_data_t *chan_data, wifi_channelStats_
 
 int stop_radio_channel_neighbor_scheduler_tasks(wifi_mon_collector_element_t *c_elem)
 {
+    wifi_util_dbg_print(WIFI_MON, "%s:%d: Manish Entering\n", __func__, __LINE__);
     wifi_monitor_t *mon_data = (wifi_monitor_t *)get_wifi_monitor();
     if (c_elem == NULL) {
         wifi_util_error_print(WIFI_MON, "%s:%d input arguments are NULL args : %p\n",__func__,__LINE__, c_elem);
@@ -334,6 +335,7 @@ int stop_radio_channel_neighbor_scheduler_tasks(wifi_mon_collector_element_t *c_
     scheduler_cancel_timer_task(mon_data->sched, c_elem->u.radio_channel_neighbor_data.scan_complete_task_id);
     scheduler_cancel_timer_task(mon_data->sched, c_elem->u.radio_channel_neighbor_data.scan_trigger_task_id);
 
+    wifi_util_dbg_print(WIFI_MON, "%s:%d: Manish Exiting",__func__, __LINE__);
     return RETURN_OK;
 }
 

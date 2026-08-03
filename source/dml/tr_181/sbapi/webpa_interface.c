@@ -158,6 +158,7 @@ static void *handle_parodus(void *arg)
 void sendWebpaMsg(char *serviceName, char *dest, char *trans_id, char *traceParent,
     char *traceState, char *contentType, char *payload, unsigned int payload_len)
 {
+    wifi_util_dbg_print(WIFI_MON, "%s:%d: Manish Entering\n", __func__, __LINE__);
     wrp_msg_t *wrp_msg;
     char source[MAX_PARAMETERNAME_LEN / 2] = { '\0' };
 
@@ -253,6 +254,7 @@ void sendWebpaMsg(char *serviceName, char *dest, char *trans_id, char *tracePare
     pthread_cond_signal(&webpa_interface.cond);
 
     pthread_mutex_unlock(&webpa_interface.lock);
+    wifi_util_dbg_print(WIFI_MON, "%s:%d: Manish Exiting\n", __func__, __LINE__);
 }
 
 int initparodusTask()

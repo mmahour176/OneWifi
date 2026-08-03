@@ -147,6 +147,7 @@ int process_assoc_dev_stats(wifi_mon_stats_args_t *args, hash_map_t *sta_map, vo
 int execute_assoc_client_stats_api(wifi_mon_collector_element_t *c_elem, wifi_monitor_t *mon_data,
     unsigned long task_interval_ms)
 {
+    wifi_util_dbg_print(WIFI_MON, "%s:%d: Maniesh Entering\n", __func__, __LINE__);
     wifi_front_haul_bss_t *bss_param = NULL;
     wifi_associated_dev3_t *dev_array = NULL;
     wifi_mon_stats_args_t *args = NULL;
@@ -647,6 +648,7 @@ int execute_assoc_client_stats_api(wifi_mon_collector_element_t *c_elem, wifi_mo
         free(assoc_data);
         free(collect_stats);
     }
+    wifi_util_dbg_print(WIFI_MON, "%s:%d: Manish Exiting",__func__, __LINE__);
     return RETURN_OK;
 }
 
