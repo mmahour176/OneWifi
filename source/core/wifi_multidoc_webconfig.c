@@ -1329,13 +1329,17 @@ done:
 }
 static int update_vap_info_managed_xfinity(void *data, wifi_vap_info_t *vap_info, pErr execRetVal)
 {
+    wifi_util_dbg_print(WIFI_CTRL, " %s  Maniesh Entry: %d \n", __func__,__LINE__ );
     int status = RETURN_OK;
     cJSON *root = NULL;
     cJSON *param = NULL;
     bool connected_building_enabled = false;
     char *blob = cJSON_Print((cJSON *)data);
 
-    root = cJSON_Parse(blob);
+    if(blob) {
+        root = cJSON_Parse(blob);
+        cJSON_free(blob);
+    }
 
     if (root == NULL) {
         wifi_util_error_print(WIFI_CTRL, "%s:Managed xfinity json parse failure\n", __func__);
@@ -1358,6 +1362,7 @@ static int update_vap_info_managed_xfinity(void *data, wifi_vap_info_t *vap_info
     vap_info->u.bss_info.connected_building_enabled = connected_building_enabled;
     wifi_util_info_print(WIFI_CTRL, "  LINE %d \"connected_building_enabled\": %s and vap_name=%s\n", __LINE__,(vap_info->u.bss_info.connected_building_enabled) ? "true" : "false",vap_info->vap_name);
     cJSON_Delete(root);
+    wifi_util_dbg_print(WIFI_CTRL, " %s  Maniesh Exit: %d \n", __func__,__LINE__ );
     return status;
 }
 
@@ -1743,6 +1748,7 @@ pErr wifi_vap_cfg_subdoc_handler(void *data)
         cJSON_Delete(root);
         goto finished;
     }
+    cJSON_Delete(root);
     free(execRetVal);
     execRetVal = xfinity_exec_common_handler(vap_blob, webconfig_subdoc_type_xfinity);
 
@@ -1912,6 +1918,7 @@ done:
 
 pErr webconf_process_managed_subdoc(void* data)
 {
+    wifi_util_dbg_print(WIFI_CTRL," %s  Maniesh Entry: %d \n", __func__,__LINE__ );
     pErr execRetVal = NULL;
     unsigned long msg_size = 0L;
     unsigned char *msg = NULL;
@@ -2003,6 +2010,7 @@ pErr webconf_process_managed_subdoc(void* data)
         wifi_util_error_print(WIFI_CTRL, "%s: json parse failure\n", __func__);
         return execRetVal;
     }
+
     cJSON *managed_wifi_enabled = cJSON_GetObjectItem(root, "ManagedWifiEnabled");
     if (managed_wifi_enabled == NULL) {
         msgpack_zone_destroy(&msg_z);
@@ -2045,7 +2053,9 @@ pErr webconf_process_managed_subdoc(void* data)
         msgpack_zone_destroy(&msg_z);
         execRetVal->ErrorCode = VALIDATION_FALIED;
         free(blob_buf);
-    free(msg);
+        free(msg);
+        cJSON_Delete(amenities_blob);
+        cJSON_Delete(vap_blob);
         cJSON_Delete(root);
         wifi_util_error_print(WIFI_CTRL, "%s: Failed to detach xfinity_blob\n", __func__);
         return execRetVal;
@@ -2057,6 +2067,8 @@ pErr webconf_process_managed_subdoc(void* data)
         strncpy(execRetVal->ErrorMsg, "Failed to detach xfinity_blob", sizeof(execRetVal->ErrorMsg)-1);
         free(blob_buf);
         free(msg);
+        cJSON_Delete(amenities_blob);
+        cJSON_Delete(vap_blob);
         cJSON_Delete(root);
         wifi_util_error_print(WIFI_CTRL, "%s: Failed to detach xfinity_blob\n", __func__);
         return execRetVal;
@@ -2068,6 +2080,9 @@ pErr webconf_process_managed_subdoc(void* data)
         execRetVal->ErrorCode = VALIDATION_FALIED;
         free(blob_buf);
         free(msg);
+        cJSON_Delete(amenities_blob);
+        cJSON_Delete(vap_blob);
+        cJSON_Delete(xfinity_blob);
         cJSON_Delete(root);
         wifi_util_error_print(WIFI_CTRL, "%s: Failed to update connectedbuilding AVPs in  Xfinity vaps \n", __func__);
         return execRetVal;
@@ -2078,11 +2093,17 @@ pErr webconf_process_managed_subdoc(void* data)
         wifi_util_info_print(WIFI_CTRL,"managed_guest vaps are reverted back to lnf_psk\n");
     }
 
-
     wifi_util_info_print(WIFI_CTRL,"Managed guest blob is applied successfuly \n");
-    cJSON_Delete(root); // don't need this anymore
+    cJSON_Delete(amenities_blob);
+    cJSON_Delete(vap_blob);
+    cJSON_Delete(xfinity_blob);
+    cJSON_Delete(root);
+    free(blob_buf);
+    free(msg);
+    msgpack_zone_destroy(&msg_z);
 
     execRetVal->ErrorCode = BLOB_EXEC_SUCCESS;
+    wifi_util_dbg_print(WIFI_CTRL, " %s  Maniesh Exit: %d \n", __func__,__LINE__ );
     return execRetVal;
 }
 
